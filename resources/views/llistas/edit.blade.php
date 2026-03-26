@@ -5,7 +5,7 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
             <h2 class="fw-bold mb-0">
-                ✏️ Editar llista
+                Editar llista
             </h2>
             <p class="mb-0 small text-white-50">Modifica les dades de la teva llista fàcilment</p>
         </div>
@@ -51,7 +51,7 @@
                     >{{ old('descripcio', $llista->descripcio) }}</textarea>
                 </div>
 
-                <div class="mb-4">
+                {{-- <div class="mb-4">
                     <label for="categoria_id" class="form-label fw-semibold text-primary">
                         Categoria
                     </label>
@@ -70,7 +70,7 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
 
                 <div class="d-flex justify-content-between align-items-center">
                     <a href="{{ route('llistas.index') }}" class="btn btn-outline-secondary px-4">

@@ -13,7 +13,7 @@ class Llista extends Model
     protected $fillable = [
         'titol',
         'descripcio',
-        'categoria_id',
+        //'categoria_id',
         'user_id',
     ];
 

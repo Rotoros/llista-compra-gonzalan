@@ -14,21 +14,17 @@ class ProducteController extends Controller
     {
         $request->validate([
             'nom' => 'required|string|max:255',
-            'quantitat' => 'required|integer|min:1',
+            'quantitat' => 'nullable|integer|min:1',
             'llista_id' => 'required|exists:llistas,id',
-            'categoria_id' => 'nullable|exists:categories,id',
         ]);
 
-        $llista = Llista::findOrFail($request->llista_id);
-
-        $llista->productes()->create([
+        Producte::create([
             'nom' => $request->nom,
-            'quantitat' => $request->quantitat,
-            'categoria_id' => $request->categoria_id,
-            'comprat' => false,
+            'quantitat' => $request->quantitat ?? 1, 
+            'llista_id' => $request->llista_id,
         ]);
 
-        return $this->redirectBack('Producte afegit correctament!');
+        return back()->with('success', 'Producte afegit!');
     }
 
     public function update(Request $request, $id)
@@ -47,37 +43,31 @@ class ProducteController extends Controller
             'categoria_id' => $request->categoria_id,
         ]);
 
-        return $this->redirectBack('Producte actualitzat correctament!');
+        return redirect()->route('llistas.show', $producte->llista_id)
+                         ->with('success', 'Producte actualitzat correctament!');
     }
 
-    public function toggleComprat(Request $request, $id)
+    public function toggleComprat($id)
     {
         $producte = Producte::findOrFail($id);
 
-        $producte->update([
-            'comprat' => $request->has('comprat'),
-        ]);
+        // 🔥 Cambiar el valor manualmente
+        $producte->comprat = !$producte->comprat;
+        $producte->save();
 
-        return $this->redirectBack('Producte marcat correctament!');
+        // 🔥 Redirigir SIEMPRE a la lista donde está el producto
+        return redirect()->route('llistas.show', $producte->llista_id)
+                         ->with('success', 'Producte actualitzat!');
     }
 
     public function destroy(Request $request, $id)
     {
         $producte = Producte::findOrFail($id);
+        $llistaId = $producte->llista_id;
+
         $producte->delete();
 
-        return $this->redirectBack('Producte eliminat correctament!');
-    }
-
-    /**
-     * Redirigir según la vista desde donde viene el formulario
-     */
-    private function redirectBack($message)
-    {
-        if (request()->input('redirect_to') === 'compartidas') {
-            return redirect()->route('llistas.compartidas')->with('success', $message);
-        }
-
-        return redirect()->route('llistas.index')->with('success', $message);
+        return redirect()->route('llistas.show', $llistaId)
+                         ->with('success', 'Producte eliminat correctament!');
     }
 }

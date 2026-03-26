@@ -27,41 +27,46 @@ class LlistaController extends Controller
         return view('llistas.index', compact('llistas', 'llistasCompartides'));
     }
     */
-    public function index()
-{
-    $usuari = Auth::user();
-    if (!$usuari) {
-        return redirect()->route('login')->with('error', 'Has d’iniciar sessió.');
-    }
-
-    // NOMÉS les llistes creades pel propi usuari
-    $llistas = Llista::where('user_id', $usuari->id)
-        ->with(['categoria', 'productes'])
-        ->get();
-
-    return view('llistas.index', compact('llistas'));
-}
-
-    public function create()
+    public function index(Request $request)
     {
         $usuari = Auth::user();
         if (!$usuari) {
             return redirect()->route('login')->with('error', 'Has d’iniciar sessió.');
         }
 
-        $categories = Categoria::where('user_id', $usuari->id)->get();
-        return view('llistas.create', compact('categories'));
+        // NOMÉS les llistes creades pel propi usuari
+        $llistas = Llista::where('user_id', $usuari->id)
+            ->with(['categoria', 'productes'])
+
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('titol', 'like', '%' . $request->search . '%');
+            })
+            ->get();
+
+        return view('llistas.index', compact('llistas'));
     }
+
+    public function create()
+    {
+        $usuari = Auth::user();
+
+        if (!$usuari) {
+            return redirect()->route('login')->with('error', 'Has d’iniciar sessió.');
+        }
+
+        return view('llistas.create');
+    }
+
 
     public function store(Request $request)
     {
         $request->validate([
             'titol' => 'required|string|max:255',
-            'categoria_id' => 'nullable|exists:categories,id',
             'descripcio' => 'nullable|string|max:500',
         ]);
 
         $usuari = Auth::user();
+
         if (!$usuari) {
             return redirect()->route('login')->with('error', 'Has d’iniciar sessió.');
         }
@@ -69,12 +74,12 @@ class LlistaController extends Controller
         Llista::create([
             'titol' => $request->titol,
             'descripcio' => $request->descripcio,
-            'categoria_id' => $request->categoria_id,
             'user_id' => $usuari->id,
         ]);
 
         return redirect()->route('llistas.index')->with('success', 'Llista creada correctament!');
     }
+
 
     public function edit($id)
     {
@@ -100,14 +105,14 @@ class LlistaController extends Controller
 
         $request->validate([
             'titol' => 'required|string|max:255',
-            'categoria_id' => 'nullable|exists:categories,id',
+            // 'categoria_id' => 'nullable|exists:categories,id',
             'descripcio' => 'nullable|string|max:500',
         ]);
 
         $llista->update([
             'titol' => $request->titol,
             'descripcio' => $request->descripcio,
-            'categoria_id' => $request->categoria_id,
+            // 'categoria_id' => $request->categoria_id,
         ]);
 
         return redirect()->route('llistas.index')->with('success', 'Llista actualitzada correctament!');
@@ -128,7 +133,8 @@ class LlistaController extends Controller
     }
 
 
-    public function compartir(Request $request, $id){
+    public function compartir(Request $request, $id)
+    {
         $usuari = Auth::user();
         $llista = Llista::find($id);
 
@@ -148,5 +154,10 @@ class LlistaController extends Controller
 
         return redirect()->route('llistas.index')->with('success', 'Llista compartida correctament amb ' . $usuariCompartit->name);
     }
+    public function show($id)
+    {
+        $llista = Llista::with('productes', 'categoria')->findOrFail($id);
 
+        return view('llistas.show', compact('llista'));
+    }
 }

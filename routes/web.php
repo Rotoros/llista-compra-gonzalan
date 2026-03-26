@@ -70,6 +70,13 @@ Route::middleware('auth')->group(function () {
     //Comprtir
     Route::post('/llistas/{id}/compartir', [CompartirLlistaController::class, 'compartir'])->name('llistas.compartir');
     Route::get('/compartido-conmigo', [CompartirLlistaController::class, 'recibidas'])->name('llistas.compartidas');
+
+    //Show
+    Route::resource('llistas', LlistaController::class);
+    Route::resource('productes', ProducteController::class);
+
+    Route::post('productes/{id}/toggle', [ProducteController::class, 'toggleComprat'])
+    ->name('productes.toggleComprat');
 });
 
 require __DIR__.'/auth.php';
