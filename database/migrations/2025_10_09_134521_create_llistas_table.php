@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('llistas', function (Blueprint $table) {
             $table->id();
-            
+
+            // Relació amb l'usuari
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('categoria_id')->nullable()->constrained('categories')->nullOnDelete();
+
+            // Camps de la llista
             $table->string('titol');
             $table->text('descripcio')->nullable();
 

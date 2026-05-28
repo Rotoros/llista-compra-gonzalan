@@ -11,7 +11,8 @@
                 <div class="card-body">
                     <form action="{{ route('llistas.store') }}" method="POST">
                         @csrf
-                        {{-- Titol --}}
+
+                        {{-- Títol --}}
                         <div class="mb-3">
                             <label for="titol" class="form-label">Nom de la llista</label>
                             <input type="text" name="titol" id="titol" 
@@ -22,20 +23,7 @@
                             @enderror
                         </div>
 
-                        {{-- Categoria --}}
-                        <div class="mb-3">
-                            <label for="categoria_id" class="form-label">Categoria (opcional)</label>
-                            <select name="categoria_id" id="categoria_id" class="form-select">
-                                <option value="">Cap categoria</option>
-                                @foreach($categories as $categoria)
-                                    <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
-                                        {{ $categoria->nom }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Descripcio --}}
+                        {{-- Descripció --}}
                         <div class="mb-3">
                             <label for="descripcio" class="form-label">Descripció (opcional)</label>
                             <textarea name="descripcio" id="descripcio" 
